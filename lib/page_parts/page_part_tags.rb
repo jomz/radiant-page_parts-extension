@@ -142,7 +142,7 @@ module PageParts
       date = if time_attr
         case
         when time_attr == 'now'
-          Time.now
+          Time.zone.now
         when ['published_at', 'created_at', 'updated_at'].include?(time_attr)
           page[time_attr]
         else
@@ -155,7 +155,9 @@ module PageParts
       else
         page.published_at || page.created_at
       end
-      date.strftime(format)
+      @i18n_date_format_keys ||= (I18n.config.backend.send(:translations)[I18n.locale][:date][:formats].keys rescue [])
+      format = @i18n_date_format_keys.include?(format.to_sym) ? format.to_sym : format
+      I18n.l date, :format => format
     end
 
   end
